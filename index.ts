@@ -92,12 +92,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     });
     
     if (!request.params.arguments) {
-      // Return a proper MCP error response instead of throwing
+      // Return a proper MCP tool error response
       return {
-        error: {
-          code: -32602, // Invalid params
-          message: "Arguments are required"
-        }
+        content: [{ type: "text", text: "Error: Arguments are required" }],
+        isError: true
       };
     }
     
@@ -116,23 +114,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     if (error instanceof z.ZodError) {
       const errorMsg = `Invalid input: ${JSON.stringify(error.errors)}`;
       log(LogLevel.ERROR, errorMsg);
-      // Return a proper MCP error response
+      // Return a proper MCP tool error response
       return {
-        error: {
-          code: -32602, // Invalid params
-          message: errorMsg
-        }
+        content: [{ type: "text", text: errorMsg }],
+        isError: true
       };
     }
     if (isJFrogError(error)) {
       const formattedError = formatJFrogError(error);
       log(LogLevel.ERROR, `JFrog API error`, { error: formattedError });
-      // Return a proper MCP error response
+      // Return a proper MCP tool error response
       return {
-        error: {
-          code: -32603, // Internal error
-          message: formattedError
-        }
+        content: [{ type: "text", text: formattedError }],
+        isError: true
       };
     }
     
@@ -140,13 +134,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined
     });
-    
-    // Return a proper MCP error response for unexpected errors
+
+    // Return a proper MCP tool error response for unexpected errors
     return {
-      error: {
-        code: -32603, // Internal error
-        message: error instanceof Error ? error.message : String(error)
-      }
+      content: [{ type: "text", text: error instanceof Error ? error.message : String(error) }],
+      isError: true
     };
   }
 });
