@@ -29,7 +29,7 @@ export const JFrogEnvironmentsResponseSchema = z.object({
 
 export const JFrogProjectSchema = z.object({
   display_name: z.string().describe("Display name of the project"),
-  description: z.string().describe("Project description"),
+  description: z.string().optional().describe("Project description"),
   admin_privileges: z.object({
     manage_members: z.boolean().describe("Whether admin can manage members"),
     manage_resources: z.boolean().describe("Whether admin can manage resources"),
